@@ -1,0 +1,1 @@
+F:\Unity Projects\GitHub\Rover Controller\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary\build\intermediates\cxx\Debug\3x4v1j11\obj\x86

@@ -8,7 +8,27 @@ public class Settings : MonoBehaviour
 {
     public List<Category> SelectedCategories { get; set; }
     public int SelectedCategoriesBinary { get; set; }
-	public static Settings Instance { get; private set; }
+    public static Settings Instance { get; private set; }
+
+    public static Action<bool> OnReceiverChange;
+    public static Action MessageCountChange;
+
+    private bool receiver = true;
+    public bool Receiver { get => receiver; set
+        {            
+            receiver = value;
+            OnReceiverChange?.Invoke(value);
+        }
+    }
+
+    // ESP Received - ESP Transmitted - Firebase Recewived - Firebase Transmitted
+    private int[] messageCount = new int[4];
+    public int[] MessageCount => messageCount;
+    public void AddMessageCount(int type)
+    {
+        messageCount[type]++;
+        MessageCountChange?.Invoke();
+    }
 
     public int LanguageIndex { get; set; } = 1;
     public string Language => Enum.GetName(typeof(Languages), LanguageIndex);
@@ -17,7 +37,6 @@ public class Settings : MonoBehaviour
     [SerializeField] public Color NeutralGreyColor;
     [SerializeField] public Color CorrectColor;
     [SerializeField] public Color WrongColor;
-
 
     private void Awake()
 	{
@@ -30,8 +49,8 @@ public class Settings : MonoBehaviour
         Debug.Log("Created Settings");
 
 		// Initiate with all
-		AddAllCategories();
-		Debug.Log("Binary:"+ Convert.ToString(SelectedCategoriesBinary, 2));
+		//AddAllCategories();
+		//Debug.Log("Binary:"+ Convert.ToString(SelectedCategoriesBinary, 2));
 	}
 
     internal void AddOrRemoveCategory(int binaryValue)

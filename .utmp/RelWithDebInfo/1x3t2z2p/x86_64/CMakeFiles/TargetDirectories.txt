@@ -1,8 +1,0 @@
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/CMakeFiles/edit_cache.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/CMakeFiles/rebuild_cache.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/GameActivity/CMakeFiles/game.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/GameActivity/CMakeFiles/edit_cache.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/GameActivity/CMakeFiles/rebuild_cache.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/FramePacing/CMakeFiles/swappywrapper.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/FramePacing/CMakeFiles/edit_cache.dir
-F:/Unity Projects/GitHub/Edible Plants/.utmp/RelWithDebInfo/1x3t2z2p/x86_64/FramePacing/CMakeFiles/rebuild_cache.dir

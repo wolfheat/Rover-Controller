@@ -1,0 +1,23 @@
+# ninja log v5
+3	924	8094482501451638	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	515b9a600f1a40d3
+56	186	8094482494108411	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	8fded581af281931
+186	340	8094482495530796	F:/Unity Projects/GitHub/Rover Controller/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/intermediates/cxx/Debug/3x4v1j11/obj/x86_64/libswappywrapper.so	a5924f4cee5d6f36
+23	800	8094482500225018	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	442218ad4ed516d8
+12	784	8094482500069789	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	3cadeac7b4fd856f
+49	832	8094482500550680	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	a21947339c915fc3
+29	813	8094482500355141	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	a3732d81b1207c6d
+42	827	8094482500500629	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ca34ddad3de31a3
+17	859	8094482500822517	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	66073775368718df
+35	903	8094482501261226	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	70d1625dce8ca614
+924	1045	8094482502580922	F:/Unity Projects/GitHub/Rover Controller/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/intermediates/cxx/Debug/3x4v1j11/obj/x86_64/libgame.so	b4fddbb58aa86f77
+58	215	8095523049455007	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	8fded581af281931
+216	393	8095523051123030	F:/Unity Projects/GitHub/Rover Controller/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/intermediates/cxx/Debug/3x4v1j11/obj/x86_64/libswappywrapper.so	a5924f4cee5d6f36
+15	891	8095523056164825	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	442218ad4ed516d8
+3	905	8095523056337610	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	3cadeac7b4fd856f
+35	906	8095523056356895	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	a3732d81b1207c6d
+43	956	8095523056807560	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ca34ddad3de31a3
+50	981	8095523057063211	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	a21947339c915fc3
+20	984	8095523057103305	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	66073775368718df
+27	1015	8095523057430420	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	70d1625dce8ca614
+9	1069	8095523057959780	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	515b9a600f1a40d3
+1069	1199	8095523059185936	F:/Unity Projects/GitHub/Rover Controller/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/build/intermediates/cxx/Debug/3x4v1j11/obj/x86_64/libgame.so	b4fddbb58aa86f77

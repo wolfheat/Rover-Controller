@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "897329021213",
+    "firebase_url": "https://rover-controller-44c8b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "rover-controller-44c8b",
+    "storage_bucket": "rover-controller-44c8b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897329021213:android:eb5b3078957c9eec6e21f4",
+        "android_client_info": {
+          "package_name": "com.WolfheatProductions.RoverController"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt1gozab_Nx5y78XprDCVvu4oso_9G7-k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

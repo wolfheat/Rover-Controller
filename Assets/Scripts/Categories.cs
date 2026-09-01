@@ -18,13 +18,13 @@ public class Categories : MonoBehaviour
 
     private void Start()
     {
-        UpdateVisuals();
+        //UpdateVisuals();
         
     }
     private void OnEnable()
     {
         // Every time this is enabled update info from the Settings?
-        StartCoroutine(UpdateVisualsDelayed());
+        //StartCoroutine(UpdateVisualsDelayed());
 
     }
 

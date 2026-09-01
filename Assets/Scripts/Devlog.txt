@@ -7,66 +7,12 @@ Mar 2025
 - Making this for my own practice ut suppling it to others with descretion.
 
 1/3		* Started Making a basic app
-		* Created a start menu visually
-		* Basic functionality for Start Menu implemented
-		* Graphics Added to Main Menu
-		* Two Options Game mode implemented
-2/3		* Made it possible to load Data from SVG file created in Excel with data, images loads by latin name
-		* File can now be loaded even if it is opened in excel
-3/3		* Implemented Keyboard mode as separate game
-		* Typing in answer shows options for player
-4/3		* Added more plants to the library
-		* Added Commonness, Avoid, Feral
-		* Added Plants now got 30
-		[Android build: 122Mb] after compress to 512x512 images -> 52Mb have 29 plants (43 images)
-5/3		* Made a border around the game, added backgrounds to text answers
-		* Corrected text
-		* Brackets autoremoved from imported text?
-		* Pictures are now randomly flipped on X axis
-		* Fixed Keyboard mode
-6/3		* Added disclamer text
-		* Added more plants [total 50, pictures: 78]
-		[Android Build: 72Mb] have 50 plants (78 images) ökning / bild = 0.57Mb/bild
-		* Basic functionality for Selecting categories
-		* List of Enabled Categories use Binary int now
-		* Categories now are selected proper
-7/3		* Make sure imported data contains Categories
-		* Added 20 plants [total 70, pictures: 106]
-		[Android Build: 90Mb] have 70 plants (106 images) ökning / bild = +0.64Mb/bild
-8/3		* Added 10 plants [total 80, pictures: 121]
-		[Android Build: 102Mb] have 80 plants (121 images)
-		[Android Build: 74Mb] Image compression 256 for pictures
-		* Fixed navigation button size
-		* Fixed Color automation in settings values
-		* Fixed answer buttons position and colliders
-		* Implemented Localization for Swedish, English, Norwegian, Finnish
-9/3		* Added 20 plants [total 100, pictures: ]
-		[Android Build: Mb] Image compression 256 for pictures
-10/3	* Fixed UI game name and lowered sprite assets sizes
-		* Added butterflies
-11/3	* Fixed build issue install on phone not enough storage space
-		* Added Information page
-		* Added info of millitary top plants
-		* Correct text now resets for every question
-		* Fixed Navigation Infopages
-		* Fixed Infopages not scaling correctly
-12/3	* Added Plants and Info pages
-		* Fixed UI scaling issues
-		* Added Cooked category
-13/3	* Fixed Startmenu Options scaling correctly
-14/3	* Fixed images and text creation in information pages. Can now integrate pictures.		
-		* UI updates
-15/3	* Added more plants
-		* Fixed fungus not showing
-		[Android Build: 75Mb] Added more plants [total 138, pictures: 204] 
-26/3	* Added more plants
-		[Android Build: 81Mb] Added more plants [total 154, pictures: 222] 
-31/3	* Added Cartotek mode showing all plants and info
+
+
+		* Make logs able to have several lines
+
 		
 		
-
-
-
 		* Ha kartotekfunktion med alla växter som man bara kan läsa. Med sökfunktion.
 
 		* För närvarande saxad text fråm bok samt wiki. Skriv om till slutgiltig anpassad version senare
