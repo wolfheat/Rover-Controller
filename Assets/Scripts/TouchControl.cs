@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 
 public enum TouchButtonType {DRIVE, LEFT, RIGHT, BACK, STATIC}
 
-
 public class TouchControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private TouchButtonType type;

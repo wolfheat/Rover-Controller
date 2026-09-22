@@ -1,8 +1,9 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class RecieverTransmittorController : MonoBehaviour
+public class RecieverTransmittorController : MonoBehaviour, IPointerClickHandler
 {
 
     [SerializeField] private TextMeshProUGUI typeText;
@@ -28,16 +29,17 @@ public class RecieverTransmittorController : MonoBehaviour
         Instance = this;
     }
 
-    public void ToggleType()
+    public void ToggleType(bool isReciever)
     {
-        bool isReciever = !Settings.Instance.Receiver;
-
+        Debug.Log("*** Toggle set to " + isReciever);
         typeText.text = isReciever ? "RECEIVER" : "TRANSMITTER";
         //buttonColorController.SetOnOff(isReciever);
-        backgroundImage.color = isReciever? colorReceiver : colorTransmitter;
-        iconImage.sprite = isReciever?  receiverSprite : transmitterSprite;
+        backgroundImage.color = isReciever ? colorReceiver : colorTransmitter;
+        iconImage.sprite = isReciever ? receiverSprite : transmitterSprite;
         Settings.Instance.Receiver = isReciever;
     }
 
+    public void ToggleType() => ToggleType(!Settings.Instance.Receiver);
 
+    public void OnPointerClick(PointerEventData eventData) => ToggleType();
 }

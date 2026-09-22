@@ -1,11 +1,21 @@
 using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class RoverController : MonoBehaviour
 {
     [SerializeField] private ButtonOnOffController ledButton;
     [SerializeField] private ButtonOnOffController ledButtonBackground;
+
+    [SerializeField] private ButtonOnOffController ledHeadButton;
+    [SerializeField] private ButtonOnOffController ledHeadButtonBackground;
+
+    [SerializeField] private ButtonOnOffController ledRearButton;
+    [SerializeField] private ButtonOnOffController ledRearButtonBackground;
+    
+    [SerializeField] private ButtonOnOffController ledScannerButton;
+    [SerializeField] private ButtonOnOffController ledScannerButtonBackground;
+
     [SerializeField] private ButtonOnOffController motorButton;
     [SerializeField] private ButtonOnOffController motorButtonBackground;
 
@@ -16,12 +26,17 @@ public class RoverController : MonoBehaviour
     [SerializeField] private ButtonOnOffController motorLeftButton;
     [SerializeField] private ButtonOnOffController motorBackButton;
 
-    [SerializeField] private Slider slider;
-
 
     private bool ledOn = false;
+    private bool ledHeadOn = false;
+    private bool ledRearOn = false;
+    private bool ledScannerOn = false;
+
+
     private bool ledMotor = false;
     private bool ledStop = false;
+
+    private bool[] directions = new bool[4];
 
     public static RoverController Instance { get; private set; }
 
@@ -38,12 +53,29 @@ public class RoverController : MonoBehaviour
     private void UpdateButtons()
     {
         // Main Buttons (ON OFF)
+
+        // Lights on
         ledButton.SetOnOff(ledOn);
         ledButtonBackground.SetOnOff(ledOn);
 
+        // HeadLights
+        ledHeadButton.SetOnOff(ledHeadOn);
+        ledHeadButtonBackground.SetOnOff(ledHeadOn);
+
+        // Rear/Brake-Lights
+        ledRearButton.SetOnOff(ledRearOn);
+        ledRearButtonBackground.SetOnOff(ledRearOn);
+                
+        // Scanner-Lights
+        ledScannerButton.SetOnOff(ledScannerOn);
+        ledScannerButtonBackground.SetOnOff(ledScannerOn);
+
+
+        // Motor
         motorButton.SetOnOff(ledMotor);
         motorButtonBackground.SetOnOff(ledMotor);
 
+        // Stop
         stopButton.SetOnOff(ledStop);
     }
 
@@ -52,8 +84,53 @@ public class RoverController : MonoBehaviour
     public void LED()
     {
         ledOn = !ledOn;
-        Debug.Log("SETTING LED: "+ledOn);
+        Debug.Log("SETTING LED: " + ledOn);
         string command = "LED " + (ledOn ? "ON" : "OFF");
+        if (!Settings.Instance.Receiver) {
+            // Call the Transmittor instead
+            RoverFirebase.Instance.SendCommand(command);
+        }
+        else {
+            ESP32.Instance.SendCommand(command);
+        }
+        UpdateButtons();
+    }
+
+    public void LED_HEAD()
+    {
+        ledHeadOn = !ledHeadOn;
+        Debug.Log("SETTING LED_HEAD: " + ledHeadOn);
+        string command = "LED_HEAD " + (ledHeadOn ? "ON" : "OFF");
+        if (!Settings.Instance.Receiver) {
+            // Call the Transmittor instead
+            RoverFirebase.Instance.SendCommand(command);
+        }
+        else {
+            ESP32.Instance.SendCommand(command);
+        }
+        UpdateButtons();
+    }
+
+    public void LED_REAR()
+    {
+        ledRearOn = !ledRearOn;
+        Debug.Log("SETTING LED_REAR: " + ledRearOn);
+        string command = "LED_REAR " + (ledRearOn ? "ON" : "OFF");
+        if (!Settings.Instance.Receiver) {
+            // Call the Transmittor instead
+            RoverFirebase.Instance.SendCommand(command);
+        }
+        else {
+            ESP32.Instance.SendCommand(command);
+        }
+        UpdateButtons();
+    }
+    
+    public void LED_SCANNER()
+    {
+        ledScannerOn = !ledScannerOn;
+        Debug.Log("SETTING LED_SCAN: " + ledScannerOn);
+        string command = "LED_SCAN " + (ledScannerOn ? "ON" : "OFF");
         if (!Settings.Instance.Receiver) {
             // Call the Transmittor instead
             RoverFirebase.Instance.SendCommand(command);
@@ -94,8 +171,7 @@ public class RoverController : MonoBehaviour
     }
 
     // SETTINGS STUFF
-
-    public void MimicSliderSetting(int duty) => slider.SetValueWithoutNotify(duty/10f);
+    public void MimicSliderSetting(int duty) => SliderController.Instance.SetDutyValue(duty);
     public void MimicButtonSetting(string command)
     {
         // Default to not set
@@ -140,10 +216,8 @@ public class RoverController : MonoBehaviour
         // Updates all non TOUCH buttons
         UpdateButtons();
     }
-
-    public void ReadSpeed() => SetSpeed((int)(slider.value*10));
-
-    private void SetSpeed(int value)
+    
+    public void SetSpeed(int value)
     {
         if (!Settings.Instance.Receiver) {
             // Call the Transmittor instead
@@ -160,6 +234,7 @@ public class RoverController : MonoBehaviour
     {
         if (!Settings.Instance.Receiver) {
             // Call the Transmittor instead
+            Debug.Log("RoverFirebase.Instance = "+ RoverFirebase.Instance);
             RoverFirebase.Instance.SendCommand(command);
             return;
         }
@@ -168,18 +243,97 @@ public class RoverController : MonoBehaviour
 
         UpdateButtons();
     }
-    
+
+    private float timer = 0;
+
+    private const float HoldTime = 0.5f; // Twice Each second
+
+    private void Update()
+    {
+        if(!IsAnyDirectionHeld()) return;
+
+        timer -= Time.deltaTime;
+
+        if(timer <= 0) {
+            timer = HoldTime;
+            // Send the Data
+
+            // Keep Sending the held buttons to the realtime database 
+            StartCoroutine(SendHeldButtonsAsCommand());
+        }
+    }
+
+    private IEnumerator SendHeldButtonsAsCommand()
+    {
+        if (directions[0]) {
+            SendCommand("MOTOR DRIVE");
+            yield return null;
+            yield return null;
+            yield return null;
+        }
+        if (directions[1]) {
+            SendCommand("MOTOR LEFT");
+            yield return null;
+            yield return null;
+            yield return null;
+        }
+        if (directions[2]) {
+            SendCommand("MOTOR RIGHT");
+            yield return null;
+            yield return null;
+            yield return null;
+        }
+        if (directions[3]) {
+            SendCommand("MOTOR BACK");
+        }
+        yield return null;
+    }
+
     // General Motor TOUCH Buttons
     public void MotorButtonPressed(TouchButtonType type)
     {
-        // An input was sent so not stopped anymore
-        ledStop = false;
-        SendCommand("MOTOR "+ type.ToString());
+        if(type == TouchButtonType.STATIC) {
+            // Force off
+            TurnAllDirectionsOff();
+        }
+        else {
+            // An input was sent so not stopped anymore
+            ledStop = false;
+            directions[(int)type] = true;
+            timer = 0; // Forces send of all values
+        }
+        // SendCommand("MOTOR "+ type.ToString());
+    }
+
+    private void TurnAllDirectionsOff()
+    {
+        for (int i = 0; i < 4; i++) {
+            directions[i] = false;
+        }
+        SendCommand("MOTOR STATIC");
     }
 
     public void MotorButtonReleased(TouchButtonType type)
     {
         ledStop = true;
-        SendCommand("MOTOR STATIC");
+        directions[(int)type] = false;
+
+        // Only Send Static if none of the direction is ON - This should handle switching before releasing a button not working
+        if(!IsAnyDirectionHeld())
+            SendCommand("MOTOR STATIC");
+        else {
+            // remove just this button
+            SendCommand("MOTOR "+type+"_OFF");
+        }
+    }
+
+    private bool IsAnyDirectionHeld()
+    {
+        for (int i = 0; i < 4; i++) 
+        {
+            if (directions[i])
+                return true;
+        }
+        return false;
     }
 }

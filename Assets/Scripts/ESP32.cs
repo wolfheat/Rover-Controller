@@ -15,6 +15,10 @@ public class ESP32 : MonoBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        // Use this to send the commands to Firebase from a queue system
+    }
 
 
     public void SendCommand(string command)

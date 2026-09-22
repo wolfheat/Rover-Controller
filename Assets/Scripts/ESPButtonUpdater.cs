@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class ESPButtonUpdater : MonoBehaviour
+public class ESPButtonUpdater : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private ButtonOnOffController espOnOffController;
 
@@ -18,5 +19,11 @@ public class ESPButtonUpdater : MonoBehaviour
     private void OnESPUpdate(bool set)
     {
         espOnOffController.SetOnOff(set);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Find any ESP target
+        ESP32Usb.Instance.Connect();
     }
 }

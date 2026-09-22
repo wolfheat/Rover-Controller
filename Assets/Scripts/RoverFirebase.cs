@@ -1,59 +1,151 @@
 using System;
 using Firebase.Database;
 using Firebase.Extensions;
-using TMPro;
 using UnityEngine;
 
 public class RoverFirebase : MonoBehaviour
 {
-    [SerializeField] private GameObject receiverMark; 
-
-    private DatabaseReference commandReference;
-
-    [SerializeField] private ButtonOnOffController firebaseOnOffController;
     public static RoverFirebase Instance { get; private set; }
 
     public static Action<string> MessageReceived;
     public static Action<string> MessageTransmitted;
     public static Action<float> IsSliderSetting;
 
+    private const string DatabaseUrl =
+        "https://rover-controller-44c8b-default-rtdb.europe-west1.firebasedatabase.app";
+
+    private FirebaseDatabase database;
+
+    private DatabaseReference commandsReference;
     private DatabaseReference connectionReference;
 
     private void Awake()
     {
+        
         if (Instance != null) {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
 
+        Instance = this;
+        Debug.Log("RoverFirebase Instance set");
+
+        // Listen for receiver setting changes
         Settings.OnReceiverChange += SetAsReceiver;
 
-        SetFirebaseStatus(false);
+        PopupText.Instance.ShowPopup("FB: AWAKE");
+
+        try {
+            // This works on the legacy Android/Firebase 9.4 setup.
+            Firebase.FirebaseApp app = Firebase.FirebaseApp.DefaultInstance;
+
+            if (app == null) {
+                PopupText.Instance.ShowPopup("FB: APP NULL");
+                return;
+            }
+
+            PopupText.Instance.ShowPopup(
+                "FB: APP OK: " + app.Name
+            );
+
+            // IMPORTANT:
+            // Do NOT use FirebaseDatabase.DefaultInstance here.
+#if UNITY_2022_3
+            // Legacy Firebase 9.4 path
+            database = FirebaseDatabase.GetInstance(app, DatabaseUrl);
+#else
+            // Newer Firebase path
+            database = FirebaseDatabase.DefaultInstance;
+#endif
+
+            if (database == null) {
+                PopupText.Instance.ShowPopup("FB: DB NULL");
+                return;
+            }
+
+            PopupText.Instance.ShowPopup("FB: DB INSTANCE OK");
+
+            commandsReference =
+                database.GetReference("rover1/commands");
+
+            PopupText.Instance.ShowPopup("FB: COMMAND OK");
+
+            connectionReference =
+                database.GetReference(".info/connected");
+
+            PopupText.Instance.ShowPopup("FB: CONNECTION OK");
+
+            Debug.Log("FIREBASE CONNECTED");
+
+
+        }
+        catch (Exception e) {
+            PopupText.Instance.ShowPopup(
+                "FB INIT EX\n" +
+                e.GetType().Name +
+                "\n" +
+                e.Message
+            );
+
+            Debug.LogError(
+                "===== FIREBASE INITIALIZATION FAILED =====\n" +
+                e
+            );
+
+            Exception inner = e.InnerException;
+            int level = 0;
+
+            while (inner != null && level < 5) {
+                Debug.LogError(
+                    "FIREBASE INNER " +
+                    level +
+                    ":\n" +
+                    inner
+                );
+
+                inner = inner.InnerException;
+                level++;
+            }
+
+            return;
+        }
     }
 
-    void Start()
+    private void Start()
     {
-        ConnectToFirebase();
 
+        if (connectionReference == null) {
+            Debug.LogError(
+                "FIREBASE: connectionReference is null in Start()"
+            );
+
+            PopupText.Instance.ShowPopup(
+                "FB: NO CONNECTION REF"
+            );
+
+            return;
+        }
+
+        // Start watching connection status
         connectionReference.ValueChanged += OnFirebaseConnectionChanged;
 
-        Debug.Log("FIREBASE: Listening for commands");
-        SetAsReceiver(Settings.Instance.Receiver);
-    }
+        Debug.Log("FIREBASE: Listening for connection");
 
-    public void ConnectToFirebase()
-    {
-        commandReference = FirebaseDatabase.DefaultInstance.GetReference("rover1/command");
-        connectionReference = FirebaseDatabase.DefaultInstance.GetReference(".info/connected");
+        // Start/stop command listener according to current setting
+        SetAsReceiver(Settings.Instance.Receiver);
+
+        Debug.Log("FIREBASE: Listening for commands");
     }
 
     private void SetFirebaseStatus(bool connected)
     {
-        firebaseOnOffController.SetOnOff(connected);
+        Debug.Log("*** Updating Firebase Status: "+connected);
+        FirebaseButtonOnOffController.Instance.SetOnOff(connected);
     }
 
-    private void OnFirebaseConnectionChanged(object sender, ValueChangedEventArgs args)
+    private void OnFirebaseConnectionChanged(
+        object sender,
+        ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null) {
             Debug.LogError(
@@ -62,6 +154,12 @@ public class RoverFirebase : MonoBehaviour
             );
 
             SetFirebaseStatus(false);
+
+            PopupText.Instance.ShowPopup(
+                "FIREBASE ERROR:\n" +
+                args.DatabaseError.Message
+            );
+
             return;
         }
 
@@ -76,183 +174,140 @@ public class RoverFirebase : MonoBehaviour
             "FIREBASE CONNECTION: " +
             (connected ? "CONNECTED" : "DISCONNECTED")
         );
+
+        PopupText.Instance.ShowPopup(
+            "FIREBASE: " +
+            (connected ? "CONNECTED" : "DISCONNECTED")
+        );
     }
     public void SetAsReceiver(bool set)
     {
-        if (set) {
-            // Stop Listening to Changes
-            if (commandReference != null) {
-                commandReference.ValueChanged += OnCommandChanged;
-            }
-        }
-        else {
-
-            if (commandReference != null) {
-                commandReference.ValueChanged -= OnCommandChanged;
-            }
-        }
+        Debug.Log("FIREBASE: Receiver setting = " + set); 
+        // Firebase commands are now consumed by the 
+        // Android relay, not by the Unity application. 
+        // 
+        // Do not attach a Firebase command listener here.
     }
 
-
-    // =====================================================
-    // =====================================================
-    // TRANSMITTOR
-    // =====================================================
-    // =====================================================
-
-    public void SendCommand(string command)
+    /*
+    public void SetAsReceiver(bool set)
     {
-        PopupText.Instance.ShowPopup("FIREBASE: Sending command: " +command);
-        MessageTransmitted?.Invoke(command);
-        commandReference
-            .SetValueAsync(command)
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted) {
-                    Debug.LogError(
-                        "FIREBASE: Send failed: " +
-                        task.Exception
-                    );
-
-                    return;
-                }
-
-                if (task.IsCanceled) {
-                    Debug.LogError(
-                        "FIREBASE: Send cancelled"
-                    );
-
-                    return;
-                }
-
-                Debug.Log(
-                    "FIREBASE: Command SUCCESSFUL"
-                );
-            });
-    }
-
-    // =====================================================
-    // RECEIVER
-    // =====================================================
-
-    private void OnCommandChanged(object sender, ValueChangedEventArgs args)
-    {
-
-        PopupText.Instance.LastCommand("Command: " + args.Snapshot.Value?.ToString());
-
-
-        if (args.DatabaseError != null) {
+        if (commandsReference == null) {
             Debug.LogError(
-                "FIREBASE: RX ERROR: " +
-                args.DatabaseError.Message
+                "FIREBASE: Cannot change receiver state; commandReference is null"
             );
 
             return;
         }
 
-        if (!args.Snapshot.Exists) {
-            Debug.Log("FIREBASE: No command");
+        if (set) {
+            // Listen to commands
+            //commandsReference.ValueChanged -= OnCommandChanged;
+            //commandsReference.ValueChanged += OnCommandChanged;
+
+            Debug.Log("FIREBASE: Command listener ENABLED");    
+        }
+        else {
+            // Stop listening to commands
+            //commandsReference.ValueChanged -= OnCommandChanged;
+
+            Debug.Log("FIREBASE: Command listener DISABLED");
+        }
+    }
+
+    */
+
+    // =====================================================
+    // TRANSMITTER
+    // =====================================================
+
+    public void SendCommand(string command)
+    {
+        if (commandsReference == null) {
+            Debug.LogError("FIREBASE: Cannot send command; commandReference is null");
+            PopupText.Instance.ShowPopup("FIREBASE: SEND FAILED\nNot connected");
             return;
         }
-
-        string command = args.Snapshot.Value?.ToString();
-
-        // Any command sent unsets the mimic Button - Then maybe sets one back as ON if applicable
-        RoverController.Instance.MimicButtonSetting(command);
-
-        MessageReceived?.Invoke(command);
-
-        PopupText.Instance.ShowPopup("FIREBASE: Recieved [" + command + "]");
-
-        Debug.Log("FIREBASE RX: [" + command + "]" );
-
-
-        // If receiving a Slider setting Update the Slider
-        SliderSetting(command);
-        /*
-        Debug.Log("FIREBASE Slider Complete");
-        if (GenericLedCommand(command)) {
-            Debug.Log("FIREBASE LED Accepted");
-            return;
+        if (string.IsNullOrEmpty(command)) { 
+            Debug.LogWarning("FIREBASE: Ignoring empty command"); 
+            return; 
         }
 
-        Debug.Log("FIREBASE LED Complete");
-        */
+        MessageTransmitted?.Invoke(command);
 
-        // ==========================================
-        // SEND COMMAND TO ESP32
-        // ==========================================
+        // Create a NEW Firebase child for every command.
+        DatabaseReference newCommand = commandsReference.Push();
+        string commandId = newCommand.Key;
+        if (string.IsNullOrEmpty(commandId)) { 
+            Debug.LogError("FIREBASE: Failed to generate command ID"); 
+            return; 
+        }
+        var commandData = new System.Collections.Generic.Dictionary<string, object> { { "command", command }, { "timestamp", ServerValue.Timestamp } };
 
-
-        ESP32Usb.Instance.SendCommand(command);
-        
-
-        // ---------------------------------------------------------
-        // Delete command after processing
-        // ---------------------------------------------------------
-
-        commandReference
-            .RemoveValueAsync()
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted) {
-                    Debug.LogError(
-                        "FIREBASE: Failed to delete command: " +
-                        task.Exception
-                    );
-
-                    return;
-                }
-
-                if (task.IsCanceled) {
-                    Debug.LogError(
-                        "FIREBASE: Delete command cancelled"
-                    );
-
-                    return;
-                }
-
-                Debug.Log(
-                    "FIREBASE: Command processed and deleted"
-                );
-            });
+        newCommand.SetValueAsync(commandData).ContinueWithOnMainThread(task => 
+        { 
+            if (task.IsFaulted) { 
+                Debug.LogError("FIREBASE: Send failed: " + task.Exception); 
+                MessageReceived?.Invoke("FIREBASE SEND ERROR:\n" + task.Exception); 
+                return; 
+            } 
+            if (task.IsCanceled) { 
+                Debug.LogError("FIREBASE: Send cancelled"); 
+                MessageReceived?.Invoke("FIREBASE SEND CANCELLED"); 
+                return; 
+            } 
+            Debug.Log("FIREBASE: Command queued: " + commandId + " -> " + command); 
+        });
+               
     }
 
     private bool GenericLedCommand(string command)
     {
-        Debug.Log("Checking for command LED: "+command);
+        Debug.Log(
+            "Checking for command LED: " + command
+        );
+         
         if (command == "LED") {
             RoverController.Instance.LED();
             return true;
         }
+
         return false;
     }
 
     private void SliderSetting(string command)
-    {        
+    {
         if (command.Length > 5 && command.Substring(0, 5) == "DUTY ") {
-            if (Int32.TryParse(command.Substring(5), out int duty)) {
+            if (Int32.TryParse(command.Substring(5),out int duty)) {
                 RoverController.Instance.MimicSliderSetting(duty);
-                Debug.Log("SliderSetting: "+duty);
+
+                Debug.Log("SliderSetting: " + duty);
             }
             else {
-                // Unable to parse duty value
                 Debug.Log("SliderSetting: Unable to parse duty value");
             }
         }
     }
 
+    // =====================================================
     // DESTROY
+    // =====================================================
 
     private void OnDestroy()
     {
-        if (commandReference != null) {
-            commandReference.ValueChanged -= OnCommandChanged;
+        if (commandsReference != null) {
+            //commandsReference.ValueChanged -= OnCommandChanged;
         }
+
         if (connectionReference != null) {
             connectionReference.ValueChanged -= OnFirebaseConnectionChanged;
         }
 
         Settings.OnReceiverChange -= SetAsReceiver;
+
+        if (Instance == this) {
+            Instance = null;
+        }
     }
 }
+
