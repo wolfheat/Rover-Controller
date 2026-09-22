@@ -36,7 +36,7 @@ public class Settings : MonoBehaviour
 
     public void SubtractMessageTime() => messageTime = Mathf.Clamp(messageTime - MessageTimeStep, 0, 20);
 
-    public void AddMessageCount(int type)
+    public void AddMessageCount(int type) 
     {
         messageCount[type]++;
         MessageCountChange?.Invoke();

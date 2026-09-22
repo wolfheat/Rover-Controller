@@ -242,6 +242,7 @@ public class RoverController : MonoBehaviour
         ESP32.Instance.SendCommand(command);
 
         UpdateButtons();
+
     }
 
     private float timer = 0;
